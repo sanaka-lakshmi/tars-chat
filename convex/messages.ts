@@ -92,13 +92,21 @@ export const addReaction = mutation({
   handler: async (ctx, { messageId, emoji, userId }) => {
     const message = await ctx.db.get(messageId)
     if (!message) return
+
+    // Explicitly type reactions array
     const reactions: { emoji: string; userIds: string[] }[] = message.reactions || []
+
     // Find existing reaction for this emoji
-    const reactionIndex = reactions.findIndex((r: { emoji: string; userIds: string[] }) => r.emoji === emoji)
+    const reactionIndex = reactions.findIndex(
+      (r: { emoji: string; userIds: string[] }) => r.emoji === emoji
+    )
+
     if (reactionIndex !== -1) {
       // Toggle: remove if user already reacted
       if (reactions[reactionIndex].userIds.includes(userId)) {
-        reactions[reactionIndex].userIds = reactions[reactionIndex].userIds.filter((id: string) => id !== userId)
+        reactions[reactionIndex].userIds = reactions[reactionIndex].userIds.filter(
+          (id: string) => id !== userId
+        )
         // Remove emoji reaction if no more users reacted
         if (reactions[reactionIndex].userIds.length === 0) {
           reactions.splice(reactionIndex, 1)
@@ -111,6 +119,7 @@ export const addReaction = mutation({
       // Create new reaction
       reactions.push({ emoji, userIds: [userId] })
     }
+
     await ctx.db.patch(messageId, { reactions })
   },
 })
