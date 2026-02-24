@@ -2,6 +2,7 @@
 
 import { useQuery, useMutation } from 'convex/react'
 import { api } from '../../convex/_generated/api'
+import { Id } from '../../convex/_generated/dataModel'
 import { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
 import { Send, Trash2, MessageCircle, ChevronDown, Copy, Smile, Edit2, X, Search, Moon, Sun, Check } from 'lucide-react'
@@ -17,10 +18,12 @@ const EMOJIS = ['👍', '❤️', '😂', '😮', '😢']
 const EMOJI_GRID = ['👍', '❤️', '😂', '😮', '😢', '😍', '🤔', '😎', '🎉', '🚀', '💯', '🔥', '✨', '👏', '😇', '😜', '😭', '🤩', '😱', '🤣', '😴', '👻', '🎈', '🌟', '💪', '👋', '🙏', '😌', '😳', '🤗']
 
 export function ChatArea({ conversationId, currentUserId }: ChatAreaProps) {
-  const messages = useQuery(api.messages.getMessages, { conversationId })
+  const convId = conversationId as Id<'conversations'>
+  const userId = currentUserId as Id<'users'>
+  const messages = useQuery(api.messages.getMessages, { conversationId: convId })
   const allUsers = useQuery(api.users.getUsers)
-  const conversation = useQuery(api.conversations.getConversation, { id: conversationId })
-  const typingUsers = useQuery(api.typing.getTypingUsers, { conversationId })
+  const conversation = useQuery(api.conversations.getConversation, { id: convId })
+  const typingUsers = useQuery(api.typing.getTypingUsers, { conversationId: convId })
   const sendMessage = useMutation(api.messages.sendMessage)
   const deleteMessage = useMutation(api.messages.deleteMessage)
   const updateMessage = useMutation(api.messages.updateMessage)
@@ -75,7 +78,7 @@ export function ChatArea({ conversationId, currentUserId }: ChatAreaProps) {
     const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current
     const atBottom = scrollTop + clientHeight >= scrollHeight - 20
     setIsAtBottom(atBottom)
-    if (atBottom && conversation) markAsRead({ conversationId, userId: currentUserId })
+    if (atBottom && conversation) markAsRead({ conversationId: convId, userId: userId })
   }
 
   useEffect(() => {
@@ -83,7 +86,7 @@ export function ChatArea({ conversationId, currentUserId }: ChatAreaProps) {
     if (isAtBottom) {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
       setShowNewMessages(false)
-      if (conversation) markAsRead({ conversationId, userId: currentUserId })
+      if (conversation) markAsRead({ conversationId: convId, userId: userId })
     } else {
       setShowNewMessages(messages.some(m => m.senderId !== currentUserId))
     }
@@ -91,32 +94,32 @@ export function ChatArea({ conversationId, currentUserId }: ChatAreaProps) {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMessageInput(e.target.value)
-    setTyping({ conversationId, userId: currentUserId, isTyping: true })
+    setTyping({ conversationId: convId, userId: userId, isTyping: true })
     if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
     typingTimeoutRef.current = setTimeout(() => {
-      setTyping({ conversationId, userId: currentUserId, isTyping: false })
+      setTyping({ conversationId: convId, userId: userId, isTyping: false })
     }, 1500)
   }
 
   const handleSend = async () => {
     if (!messageInput.trim()) return
     await sendMessage({
-      conversationId,
-      senderId: currentUserId,
+      conversationId: convId,
+      senderId: userId,
       content: messageInput.trim(),
       replyTo: replyingTo?._id || undefined,
     })
     setMessageInput('')
     setReplyingTo(null)
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-    setTyping({ conversationId, userId: currentUserId, isTyping: false })
+    setTyping({ conversationId: convId, userId: userId, isTyping: false })
   }
 
   const toggleMenu = (messageId: string) =>
     setOpenMenu(openMenu === messageId ? null : messageId)
 
   const handleDelete = async (messageId: string) => {
-    await deleteMessage({ messageId, userId: currentUserId })
+    await deleteMessage({ messageId, userId: userId })
     setOpenMenu(null)
   }
 
@@ -137,7 +140,7 @@ export function ChatArea({ conversationId, currentUserId }: ChatAreaProps) {
 
   const handleSaveEdit = async () => {
     if (!editingId || !editingContent.trim()) return
-    await updateMessage({ messageId: editingId, content: editingContent.trim(), userId: currentUserId })
+    await updateMessage({ messageId: editingId, content: editingContent.trim(), userId: userId })
     setEditingId(null)
     setEditingContent('')
   }
@@ -148,7 +151,7 @@ export function ChatArea({ conversationId, currentUserId }: ChatAreaProps) {
   }
 
   const handleReact = (messageId: string, emoji: string) => {
-    addReaction({ messageId, emoji, userId: currentUserId })
+    addReaction({ messageId, emoji, userId: userId })
     setShowReactMenu(null)
     setOpenMenu(null)
   }
@@ -513,7 +516,7 @@ export function ChatArea({ conversationId, currentUserId }: ChatAreaProps) {
           onClick={() => {
             messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
             setShowNewMessages(false)
-            if (conversation) markAsRead({ conversationId, userId: currentUserId })
+            if (conversation) markAsRead({ conversationId: convId, userId: userId })
           }}
           className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-4 py-2 rounded-full shadow-lg hover:bg-blue-600 z-20"
         >
