@@ -118,14 +118,13 @@ export function ChatArea({ conversationId, currentUserId }: ChatAreaProps) {
   const toggleMenu = (messageId: string) =>
     setOpenMenu(openMenu === messageId ? null : messageId)
 
-  const handleDelete = async (messageId: string) => {
-    await deleteMessage({ 
-      messageId: { __tableName: "messages", id: messageId }, 
-      userId: { __tableName: "users", id: userId } 
-    })
-    setOpenMenu(null)
-  }
-
+ const handleDelete = async (messageId: string) => {
+  await deleteMessage({ 
+    messageId: Id('messages', messageId), 
+    userId: userId // already typed as Id<'users'> above
+  })
+  setOpenMenu(null)
+}
   const handleReply = (message: any) => {
     setReplyingTo(message)
     setOpenMenu(null)
