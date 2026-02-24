@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "echo 'Skipping Convex codegen on Vercel'"
+    "postinstall": "npx convex codegen"
   },
   "dependencies": {
     "@clerk/nextjs": "^4.29.9",
