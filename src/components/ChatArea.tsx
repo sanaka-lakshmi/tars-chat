@@ -119,7 +119,10 @@ export function ChatArea({ conversationId, currentUserId }: ChatAreaProps) {
     setOpenMenu(openMenu === messageId ? null : messageId)
 
   const handleDelete = async (messageId: string) => {
-    await deleteMessage({ messageId, userId: userId })
+    await deleteMessage({ 
+  messageId: { __tableName: "messages", id: messageId }, 
+  userId: { __tableName: "users", id: userId } 
+})
     setOpenMenu(null)
   }
 
