@@ -1,12 +1,11 @@
 'use client'
-import { SomeType, Id } from '../convex/_generated/dataModel'
-import { api } from '../convex/_generated/api'
+import { SomeType, Id } from '../../convex/_generated/dataModel'
+import { api } from '../../convex/_generated/api'
 import { useQuery, useMutation } from 'convex/react'
 import { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
 import { Send, Trash2, MessageCircle, ChevronDown, Copy, Smile, Edit2, X, Search, Moon, Sun, Check } from 'lucide-react'
 import { useTheme } from './ChatApp'
-
 interface ChatAreaProps {
   conversationId: string
   currentUserId: string
