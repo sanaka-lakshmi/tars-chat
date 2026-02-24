@@ -1,8 +1,8 @@
 'use client'
-import { SomeType } from '@/convex/_generated/dataModel'
+
+import { SomeType, Id } from '@/convex/_generated/dataModel'
 import { useQuery, useMutation } from 'convex/react'
-import { api } from '../../convex/_generated/api'
-import { Id } from '../../convex/_generated/dataModel'
+import { api } from '@/convex/_generated/api'
 import { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
 import { Send, Trash2, MessageCircle, ChevronDown, Copy, Smile, Edit2, X, Search, Moon, Sun, Check } from 'lucide-react'
