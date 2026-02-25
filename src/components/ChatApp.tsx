@@ -3,7 +3,7 @@
 import { useMutation } from 'convex/react'
 import { api } from '../../convex/_generated/api'
 import { useUser } from '@clerk/nextjs'
-import { useState, useEffect, createContext, useContext } from 'react'
+import { useState, useEffect, useRef, createContext, useContext } from 'react'
 import { Sidebar } from './Sidebar'
 import { ChatArea } from './ChatArea'
 
@@ -30,6 +30,7 @@ export function ChatApp() {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null)
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null)
   const [isDark, setIsDark] = useState(false)
+  const inactivityTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Initialize dark mode from localStorage
   useEffect(() => {
@@ -57,6 +58,18 @@ export function ChatApp() {
     setSelectedConversation(id)
   }
 
+  const resetInactivityTimer = (userClerkId: string) => {
+    if (inactivityTimeoutRef.current) clearTimeout(inactivityTimeoutRef.current)
+    
+    // Mark user as online immediately on activity
+    setOnline({ clerkId: userClerkId, online: true })
+    
+    // Set user to inactive after 5 minutes of no activity
+    inactivityTimeoutRef.current = setTimeout(() => {
+      setOnline({ clerkId: userClerkId, online: false })
+    }, 5 * 60 * 1000)
+  }
+
   useEffect(() => {
     if (user) {
       syncUser({
@@ -70,6 +83,47 @@ export function ChatApp() {
       })
     }
   }, [user, syncUser, setOnline])
+
+  useEffect(() => {
+    if (!user) return
+
+    const handleActivity = () => {
+      resetInactivityTimer(user.id)
+    }
+
+    // Track user activity
+    window.addEventListener('mousemove', handleActivity)
+    window.addEventListener('keydown', handleActivity)
+    window.addEventListener('click', handleActivity)
+    window.addEventListener('scroll', handleActivity)
+
+    // Handle page visibility
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        // User left the page
+        setOnline({ clerkId: user.id, online: false })
+        if (inactivityTimeoutRef.current) clearTimeout(inactivityTimeoutRef.current)
+      } else {
+        // User came back
+        resetInactivityTimer(user.id)
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
+    // Initial activity
+    resetInactivityTimer(user.id)
+
+    // Clean up on unmount
+    return () => {
+      window.removeEventListener('mousemove', handleActivity)
+      window.removeEventListener('keydown', handleActivity)
+      window.removeEventListener('click', handleActivity)
+      window.removeEventListener('scroll', handleActivity)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      if (inactivityTimeoutRef.current) clearTimeout(inactivityTimeoutRef.current)
+    }
+  }, [user, setOnline])
 
   if (!currentUserId) return <div>Loading...</div>
 

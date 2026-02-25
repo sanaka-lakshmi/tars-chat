@@ -1,4 +1,5 @@
-'use client'
+"use client"
+import { formatActivityStatus } from '../utils/formatActivityStatus'
 import { Id } from '../../convex/_generated/dataModel'
 import { api } from '../../convex/_generated/api'
 import { useQuery, useMutation } from 'convex/react'
@@ -40,11 +41,21 @@ export function ChatArea({ conversationId, currentUserId }: ChatAreaProps) {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editingContent, setEditingContent] = useState('')
   const [showNamesFor, setShowNamesFor] = useState<{ messageId: string, emoji: string } | null>(null)
+  const [, setRefreshKey] = useState(0)
 
   const emojiPickerRef = useRef<HTMLDivElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Refresh activity status every 30 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setRefreshKey(prev => prev + 1)
+    }, 30000) // 30 seconds
+
+    return () => clearInterval(interval)
+  }, [])
 
   useEffect(() => {
     if (!showEmojiPicker) return;
@@ -213,13 +224,7 @@ export function ChatArea({ conversationId, currentUserId }: ChatAreaProps) {
             </div>
           ) : (
             <p className="text-sm text-gray-500">
-              {otherUser?.isOnline
-                ? 'online'
-                : `last seen ${
-                    otherUser?.lastSeen
-                      ? new Date(otherUser.lastSeen).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                      : 'unknown'
-                  }`}
+              {formatActivityStatus(otherUser?.isOnline || false, otherUser?.lastSeen || 0)}
             </p>
           )}
         </>

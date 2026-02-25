@@ -1,7 +1,7 @@
-'use client'
-
+"use client"
+import { formatActivityStatus } from '../utils/formatActivityStatus'
 import { useQuery, useMutation } from 'convex/react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useGlobalTypingIndicators } from './useGlobalTypingIndicators'
 import { api } from '../../convex/_generated/api'
 import Image from 'next/image'
@@ -25,6 +25,17 @@ export function Sidebar({ currentUserId, onSelectConversation }: SidebarProps) {
   const [creatingGroup, setCreatingGroup] = useState(false)
   const [selectedUsers, setSelectedUsers] = useState<string[]>([])
   const [groupName, setGroupName] = useState('')
+
+  const [, setRefreshKey] = useState(0)
+
+  // Refresh activity status every 30 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setRefreshKey(prev => prev + 1)
+    }, 30000) // 30 seconds
+
+    return () => clearInterval(interval)
+  }, [])
 
   const filteredUsers = users?.filter(u => u._id !== currentUserId && u.name.toLowerCase().includes(search.toLowerCase()))
 
@@ -162,7 +173,7 @@ export function Sidebar({ currentUserId, onSelectConversation }: SidebarProps) {
                   </div>
                   <div className="ml-3">
                     <p className={`font-medium ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{u.name}</p>
-                    <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{u.isOnline ? 'Online' : 'Offline'}</p>
+                      <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{formatActivityStatus(u.isOnline || false, u.lastSeen || 0)}</p>
                   </div>
                 </div>
               ))
