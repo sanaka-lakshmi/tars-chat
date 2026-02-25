@@ -6,7 +6,7 @@ import { useGlobalTypingIndicators } from './useGlobalTypingIndicators'
 import { api } from '../../convex/_generated/api'
 import Image from 'next/image'
 import { Search, Users, MessageCircle } from 'lucide-react'
-import { useTheme } from './ChatApp'
+import { useTheme } from './ThemeProvider'
 
 interface SidebarProps {
   currentUserId: string

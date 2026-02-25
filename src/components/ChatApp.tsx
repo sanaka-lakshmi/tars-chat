@@ -3,25 +3,12 @@
 import { useMutation } from 'convex/react'
 import { api } from '../../convex/_generated/api'
 import { useUser } from '@clerk/nextjs'
-import { useState, useEffect, useRef, createContext, useContext } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Moon, Sun } from 'lucide-react'
 import { Sidebar } from './Sidebar'
 import { ChatArea } from './ChatArea'
+import { useTheme } from './ThemeProvider'
 
-interface ThemeContextType {
-  isDark: boolean
-  toggleDarkMode: () => void
-}
-
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
-
-export function useTheme() {
-  const context = useContext(ThemeContext)
-  if (!context) {
-    throw new Error('useTheme must be used within ThemeProvider')
-  }
-  return context
-}
 
 export function ChatApp() {
   const { user } = useUser()
@@ -110,6 +97,10 @@ export function ChatApp() {
       }
     }
 
+    // Listen for openSidebar custom events from the page header
+    const openSidebarListener = () => setShowSidebar(true)
+    window.addEventListener('openSidebar', openSidebarListener as EventListener)
+
     document.addEventListener('visibilitychange', handleVisibilityChange)
 
     // Initial activity
@@ -121,6 +112,7 @@ export function ChatApp() {
       window.removeEventListener('keydown', handleActivity)
       window.removeEventListener('click', handleActivity)
       window.removeEventListener('scroll', handleActivity)
+      window.removeEventListener('openSidebar', openSidebarListener as EventListener)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
       if (inactivityTimeoutRef.current) clearTimeout(inactivityTimeoutRef.current)
     }
@@ -129,26 +121,7 @@ export function ChatApp() {
   if (!currentUserId) return <div>Loading...</div>
 
   return (
-    <ThemeContext.Provider value={{ isDark, toggleDarkMode }}>
       <div className={`flex h-screen ${isDark ? 'dark' : ''}`}>
-        <div className="fixed inset-x-0 top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b dark:border-gray-700">
-          <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <button className="sm:hidden p-2 rounded-md bg-white/90 dark:bg-gray-800/90" onClick={() => setShowSidebar(true)} aria-label="Open menu">☰</button>
-              <div className="font-semibold">Tars Chat</div>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={toggleDarkMode}
-                className={`p-2 rounded ${isDark ? 'bg-gray-800/70' : 'bg-white/70'}`}
-                title="Toggle dark mode"
-              >
-                {isDark ? <Sun className="w-5 h-5 text-yellow-300" /> : <Moon className="w-5 h-5 text-gray-700" />}
-              </button>
-            </div>
-          </div>
-        </div>
-
         <div className="pt-12 flex h-screen w-full bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
           {/* Mobile sidebar overlay */}
           <div className={`sm:hidden ${showSidebar ? 'block' : 'hidden'}`}>
@@ -166,8 +139,6 @@ export function ChatApp() {
             />
           </div>
 
-          {/* Mobile menu button */}
-          <button className="sm:hidden absolute top-4 left-4 z-50 p-2 rounded-md bg-white/80 dark:bg-gray-800/80" onClick={() => setShowSidebar(true)} aria-label="Open menu">☰</button>
           {selectedConversation ? (
             <ChatArea conversationId={selectedConversation} currentUserId={currentUserId} />
           ) : (
@@ -181,6 +152,5 @@ export function ChatApp() {
           )}
         </div>
       </div>
-    </ThemeContext.Provider>
   )
 }

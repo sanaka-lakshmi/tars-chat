@@ -6,7 +6,7 @@ import { useQuery, useMutation } from 'convex/react'
 import { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
 import { Send, Trash2, MessageCircle, ChevronDown, Copy, Smile, Edit2, X, Search, Moon, Sun, Check } from 'lucide-react'
-import { useTheme } from './ChatApp'
+import { useTheme } from './ThemeProvider'
 interface ChatAreaProps {
   conversationId: string
   currentUserId: string
