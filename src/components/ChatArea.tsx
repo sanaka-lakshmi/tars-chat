@@ -1,6 +1,6 @@
 'use client'
-import { SomeType, Id } from '@/convex/_generated/dataModel'
-import { api } from '@/convex/_generated/api'
+import { Id } from '../../convex/_generated/dataModel'
+import { api } from '../../convex/_generated/api'
 import { useQuery, useMutation } from 'convex/react'
 import { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
@@ -118,7 +118,7 @@ export function ChatArea({ conversationId, currentUserId }: ChatAreaProps) {
 
  const handleDelete = async (messageId: string) => {
   await deleteMessage({ 
-    messageId: Id('messages', messageId), 
+    messageId: messageId as Id<'messages'>, 
     userId: userId // already typed as Id<'users'> above
   })
   setOpenMenu(null)
@@ -140,7 +140,7 @@ export function ChatArea({ conversationId, currentUserId }: ChatAreaProps) {
 
   const handleSaveEdit = async () => {
     if (!editingId || !editingContent.trim()) return
-    await updateMessage({ messageId: editingId, content: editingContent.trim(), userId: userId })
+    await updateMessage({ messageId: editingId as Id<'messages'>, content: editingContent.trim(), userId: userId })
     setEditingId(null)
     setEditingContent('')
   }
@@ -151,7 +151,7 @@ export function ChatArea({ conversationId, currentUserId }: ChatAreaProps) {
   }
 
   const handleReact = (messageId: string, emoji: string) => {
-    addReaction({ messageId, emoji, userId: userId })
+    addReaction({ messageId: messageId as Id<'messages'>, emoji, userId: userId })
     setShowReactMenu(null)
     setOpenMenu(null)
   }
@@ -351,7 +351,7 @@ export function ChatArea({ conversationId, currentUserId }: ChatAreaProps) {
                         {m.reactions && (
                           <div className="flex flex-wrap gap-1 mt-2">
                             {Array.isArray(m.reactions) ? (
-                              m.reactions.length > 0 && m.reactions.map(({ emoji, userIds }) => {
+                              m.reactions.length > 0 && m.reactions.map(({ emoji, userIds }: { emoji: string; userIds: string[] }) => {
                                 const names = (allUsers || []).filter(u => userIds.includes(u._id)).map(u => u.name).join(', ')
                                 const isOpen = showNamesFor && showNamesFor.messageId === m._id && showNamesFor.emoji === emoji
                                 return (
