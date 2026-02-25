@@ -12,10 +12,10 @@ export default function Home() {
     <div className={`min-h-screen ${isDark ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'}`}> 
       <SignedOut>
         <div className="flex items-center justify-center min-h-screen">
-          <div className="bg-white p-8 rounded-lg shadow-md text-center max-w-md">
+          <div className={`p-8 rounded-lg shadow-md text-center max-w-md ${isDark ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'}`}>
             <MessageCircle className="w-16 h-16 mx-auto mb-4 text-blue-500" />
             <h1 className="text-3xl font-bold mb-4">Welcome to Tars Chat</h1>
-            <p className="text-gray-600 mb-6">Connect and chat with your friends in real-time</p>
+            <p className={`mb-6 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Connect and chat with your friends in real-time</p>
             <SignInButton>
               <button className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 transition-colors">
                 Sign In
