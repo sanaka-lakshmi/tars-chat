@@ -120,11 +120,11 @@ export function ChatApp() {
           {selectedConversation ? (
             <ChatArea conversationId={selectedConversation} currentUserId={currentUserId} />
           ) : (
-            <div className="flex-1 flex items-center justify-center bg-gray-50 dark:bg-gray-800">
+            <div className={`flex-1 flex items-center justify-center ${isDark ? 'bg-gray-800' : 'bg-gray-50'}`}>
               <div className="text-center">
                 <div className="text-6xl mb-4">💬</div>
-                <h2 className="text-2xl font-semibold text-gray-700 dark:text-gray-300 mb-2">Welcome to Tars Chat</h2>
-                <p className="text-gray-500 dark:text-gray-400">Select a user or conversation to start chatting</p>
+                <h2 className={`text-2xl font-semibold mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Welcome to Tars Chat</h2>
+                <p className={`${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Select a user or conversation to start chatting</p>
               </div>
             </div>
           )}

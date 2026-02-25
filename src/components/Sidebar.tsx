@@ -23,6 +23,9 @@ export function Sidebar({ currentUserId, onSelectConversation, onClose }: Sideba
   const typingByConversation = useGlobalTypingIndicators(currentUserId)
   const [search, setSearch] = useState('')
   const [activeTab, setActiveTab] = useState<'users' | 'conversations'>('users')
+
+  // compute unread messages across all conversations for badge
+  const totalUnread = conversations?.reduce((sum, c) => sum + (c.unreadCount || 0), 0) || 0
   const [creatingGroup, setCreatingGroup] = useState(false)
   const [selectedUsers, setSelectedUsers] = useState<string[]>([])
   const [groupName, setGroupName] = useState('')
@@ -99,7 +102,13 @@ export function Sidebar({ currentUserId, onSelectConversation, onClose }: Sideba
             }`}
           >
             <MessageCircle className="w-4 h-4 mr-2" />
-            Chats
+            <span className="relative">Chats
+              {totalUnread > 0 && activeTab !== 'conversations' && (
+                <span className="absolute -top-2 -right-6 inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold leading-none text-white bg-red-500 rounded-full">
+                  {totalUnread}
+                </span>
+              )}
+            </span>
           </button>
         </div>
         {activeTab === 'users' && (

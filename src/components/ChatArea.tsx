@@ -130,7 +130,7 @@ export function ChatArea({ conversationId, currentUserId }: ChatAreaProps) {
  const handleDelete = async (messageId: string) => {
   await deleteMessage({ 
     messageId: messageId as Id<'messages'>, 
-    userId: userId // already typed as Id<'users'> above
+    userId: userId
   })
   setOpenMenu(null)
 }
@@ -189,8 +189,12 @@ export function ChatArea({ conversationId, currentUserId }: ChatAreaProps) {
     if (conversation.isGroup) {
       chatHeader = (
         <>
-          <h2 className={`text-lg font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{conversation.name || 'Group Chat'}</h2>
-          <p className="text-sm text-gray-500">{conversation.participants.length} members</p>
+          <h2 className={`text-lg font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
+            {conversation.name || 'Group Chat'}
+          </h2>
+          <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+            {conversation.participants.length} members
+          </p>
           {typingUsers && typingUsers.length > 0 && (
             <div className="flex items-center gap-2 mt-2 flex-wrap">
               {typingUsers.map(user => (
@@ -212,7 +216,9 @@ export function ChatArea({ conversationId, currentUserId }: ChatAreaProps) {
       const otherUser = allUsers?.find(u => u._id === otherUserId);
       chatHeader = (
         <>
-          <h2 className={`text-lg font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{otherUser?.name || 'Loading...'}</h2>
+          <h2 className={`text-lg font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
+            {otherUser?.name || 'Loading...'}
+          </h2>
           {typingUsers && typingUsers.some(u => u._id === otherUserId) ? (
             <div className="flex items-center gap-1">
               <p className="text-sm text-green-500 font-medium">typing</p>
@@ -223,7 +229,7 @@ export function ChatArea({ conversationId, currentUserId }: ChatAreaProps) {
               </div>
             </div>
           ) : (
-            <p className="text-sm text-gray-500">
+            <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
               {formatActivityStatus(otherUser?.isOnline || false, otherUser?.lastSeen || 0)}
             </p>
           )}
@@ -235,10 +241,10 @@ export function ChatArea({ conversationId, currentUserId }: ChatAreaProps) {
   return (
     <div className={`flex-1 flex flex-col border-l ${isDark ? 'bg-gray-900 border-gray-800' : 'bg-gray-50 border-gray-200'}`}>
       {/* Chat Header */}
-      <div className={`p-4 border-b ${isDark ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'}`}>
+      <div className={`${isDark ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'} p-4 border-b`}>
         <div className="flex items-center justify-between">
           <div className="flex-1">
-            {conversation ? chatHeader : <p className="text-gray-500">Loading conversation...</p>}
+            {conversation ? chatHeader : <p className={`${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Loading conversation...</p>}
           </div>
           <div className="flex gap-2 ml-4">
             {/* Theme toggle moved to global header in ChatApp */}
@@ -257,16 +263,16 @@ export function ChatArea({ conversationId, currentUserId }: ChatAreaProps) {
         {messages === undefined ? (
           <div>Loading messages...</div>
         ) : filteredMessages?.length === 0 ? (
-          <div className={`text-center ${isDark ? 'text-gray-400' : 'text-gray-500'} mt-8`}>
+          <div className={`text-center mt-8 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
             <MessageCircle className={`w-16 h-16 mx-auto mb-4 ${isDark ? 'text-gray-600' : 'text-gray-300'}`} />
-            <h3 className={`text-lg font-medium mb-2 ${isDark ? 'text-gray-300' : ''}`}>No messages yet</h3>
+            <h3 className={`text-lg font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-gray-900'}`}>No messages yet</h3>
             <p>Start the conversation by sending a message!</p>
           </div>
         ) : (
           Object.entries(groupMessagesByDate(filteredMessages || [])).map(([dateLabel, msgs]) => (
             <div key={dateLabel}>
               <div className="flex justify-center my-4">
-                <div className={`${isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-600'} px-3 py-1 rounded-full text-sm`}>{dateLabel}</div>
+                <div className={`px-3 py-1 rounded-full text-sm ${isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-600'}`}>{dateLabel}</div>
               </div>
               {msgs.map(m => {
                 const sender = allUsers?.find(u => u._id === m.senderId)
@@ -277,6 +283,9 @@ export function ChatArea({ conversationId, currentUserId }: ChatAreaProps) {
                     key={m._id}
                     id={`message-${m._id}`}
                     className={`flex group ${isOwn ? 'justify-end' : 'justify-start'}`}
+                    onClick={() => {
+                      if (conversation) markAsRead({ conversationId: convId, userId: userId });
+                    }}
                   >
                     {!isOwn && (
                       <Image
@@ -290,7 +299,7 @@ export function ChatArea({ conversationId, currentUserId }: ChatAreaProps) {
                     <div className="max-w-xs lg:max-w-md relative flex items-start">
                       <div
                         className={`px-4 py-2 rounded-lg relative ${
-                          isOwn ? 'bg-blue-500 text-white' : `${isDark ? 'bg-gray-700 text-gray-100' : 'bg-white text-gray-900'}`
+                          isOwn ? 'bg-blue-500 text-white' : (isDark ? 'bg-gray-700 text-gray-100' : 'bg-white text-gray-900')
                         }`}
                       >
                         {isEditing ? (
@@ -299,7 +308,7 @@ export function ChatArea({ conversationId, currentUserId }: ChatAreaProps) {
                               type="text"
                               value={editingContent}
                               onChange={(e) => setEditingContent(e.target.value)}
-                              className={`px-2 py-1 border rounded ${isDark ? 'bg-gray-600 border-gray-500 text-white' : 'bg-white border-gray-300'}`}
+                              className={`px-2 py-1 border rounded ${isDark ? 'bg-gray-600 border-gray-500 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
                               autoFocus
                             />
                             <div className="flex gap-2 text-xs">
@@ -339,7 +348,7 @@ export function ChatArea({ conversationId, currentUserId }: ChatAreaProps) {
                               {m.isDeleted ? 'This message was deleted' : m.content}
                             </p>
                             {m.editedAt && !m.isDeleted && (
-                              <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'} italic mt-1`}>
+                              <p className={`text-xs italic mt-1 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                                 (edited)
                               </p>
                             )}
@@ -371,7 +380,7 @@ export function ChatArea({ conversationId, currentUserId }: ChatAreaProps) {
                                       <span className="ml-1">{userIds.length}</span>
                                     )}
                                     {isOpen && (
-                                      <span className={`absolute left-0 top-full mt-1 px-2 py-1 rounded shadow-lg z-20 whitespace-nowrap ${isDark ? 'bg-gray-800 text-blue-200' : 'bg-white text-blue-800 border border-blue-300'}`}>{names}</span>
+                                      <span className="absolute left-0 top-full mt-1 px-2 py-1 rounded shadow-lg z-20 whitespace-nowrap bg-white text-blue-800 border border-blue-300 dark:bg-gray-800 dark:text-blue-200">{names}</span>
                                     )}
                                   </span>
                                 )
@@ -398,7 +407,7 @@ export function ChatArea({ conversationId, currentUserId }: ChatAreaProps) {
                                       <span className="ml-1">{(userIds as string[]).length}</span>
                                     )}
                                     {isOpen && (
-                                      <span className={`absolute left-0 top-full mt-1 px-2 py-1 rounded shadow-lg z-20 whitespace-nowrap ${isDark ? 'bg-gray-800 text-blue-200' : 'bg-white text-blue-800 border border-blue-300'}`}>{names}</span>
+                                      <span className="absolute left-0 top-full mt-1 px-2 py-1 rounded shadow-lg z-20 whitespace-nowrap bg-white text-blue-800 border border-blue-300 dark:bg-gray-800 dark:text-blue-200">{names}</span>
                                     )}
                                   </span>
                                 )
@@ -408,7 +417,7 @@ export function ChatArea({ conversationId, currentUserId }: ChatAreaProps) {
                         )}
 
                         {!m.isDeleted && (
-                          <p className={`text-xs mt-1 ${isOwn ? 'text-blue-200' : 'text-gray-500'}`}>
+                          <p className={`text-xs mt-1 ${isOwn ? 'text-blue-200' : 'text-gray-500 dark:text-gray-400'}`}>
                             {formatTimestamp(m.timestamp)}
                           </p>
                         )}
@@ -418,14 +427,14 @@ export function ChatArea({ conversationId, currentUserId }: ChatAreaProps) {
                           <div data-menu="true" className={`absolute ${isOwn ? '-left-16' : '-right-16'} top-1 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity`}>
                             <button
                               onClick={() => setShowReactMenu(showReactMenu === m._id ? null : m._id)}
-                              className={`p-1 rounded ${isDark ? 'bg-gray-700 hover:bg-gray-600' : 'bg-white hover:bg-gray-100'} shadow`}
+                              className="p-1 rounded bg-white hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 shadow"
                               title="React"
                             >
                               <Smile className="w-4 h-4 text-gray-500" />
                             </button>
                             <button
                               onClick={() => toggleMenu(m._id)}
-                              className={`p-1 rounded ${isDark ? 'bg-gray-700 hover:bg-gray-600' : 'bg-white hover:bg-gray-100'} shadow`}
+                              className="p-1 rounded bg-white hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 shadow"
                               title="More options"
                             >
                               <ChevronDown className="w-4 h-4 text-gray-500" />
@@ -436,7 +445,7 @@ export function ChatArea({ conversationId, currentUserId }: ChatAreaProps) {
                         {/* Dropdown menu */}
                         {openMenu === m._id && (
                           <div
-                            className={`absolute ${isOwn ? 'right-0' : 'left-0'} top-full mt-1 rounded shadow-lg z-10 min-w-max ${isDark ? 'bg-gray-700 border border-gray-600' : 'bg-white border border-gray-200'}`}
+                            className={`absolute ${isOwn ? 'right-0' : 'left-0'} top-full mt-1 rounded shadow-lg z-10 min-w-max ${isDark ? 'bg-gray-700 border-gray-600' : 'bg-white border border-gray-200'}`}
                             data-menu="true" onClick={e => e.stopPropagation()}
                           >
                             <button
@@ -552,7 +561,7 @@ export function ChatArea({ conversationId, currentUserId }: ChatAreaProps) {
                       setMessageInput(messageInput + emoji)
                       setShowEmojiPicker(false)
                     }}
-                    className={`text-2xl hover:${isDark ? 'bg-gray-600' : 'bg-gray-200'} p-2 rounded cursor-pointer transition`}
+                    className={`text-2xl p-2 rounded cursor-pointer transition ${isDark ? 'dark:hover:bg-gray-600 hover:bg-gray-200' : 'hover:bg-gray-200'}`}
                     title={emoji}
                   >
                     {emoji}
@@ -564,7 +573,7 @@ export function ChatArea({ conversationId, currentUserId }: ChatAreaProps) {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-              className={`text-gray-500 hover:text-gray-700 p-2 rounded hover:${isDark ? 'bg-gray-700' : 'bg-gray-100'} flex items-center justify-center`}
+              className={`text-gray-500 hover:text-gray-700 p-2 rounded ${isDark ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100'} flex items-center justify-center`}
               title="Add emoji"
             >
               <Smile className="w-5 h-5" />
