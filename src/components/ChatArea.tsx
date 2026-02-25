@@ -241,13 +241,7 @@ export function ChatArea({ conversationId, currentUserId }: ChatAreaProps) {
             {conversation ? chatHeader : <p className="text-gray-500">Loading conversation...</p>}
           </div>
           <div className="flex gap-2 ml-4">
-            <button
-              onClick={toggleDarkMode}
-              className={`p-2 rounded hover:${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}
-              title="Toggle dark mode"
-            >
-              {isDark ? <Sun className="w-5 h-5 text-yellow-300" /> : <Moon className="w-5 h-5 text-gray-700" />}
-            </button>
+            {/* Theme toggle moved to global header in ChatApp */}
           </div>
         </div>
       </div>

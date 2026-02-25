@@ -1,5 +1,11 @@
 export function formatActivityStatus(isOnline: boolean, lastSeen: number): string {
-  if (isOnline) {
+  // Treat as "online" only when the user reports online and their lastSeen
+  // timestamp is very recent (within ONLINE_THRESHOLD_MS). This avoids
+  // showing accounts as online long after they were created or when the
+  // client that set them online never cleared the status.
+  const ONLINE_THRESHOLD_MS = 2 * 60 * 1000 // 2 minutes
+  const now = Date.now()
+  if (isOnline && lastSeen && now - lastSeen <= ONLINE_THRESHOLD_MS) {
     return 'online'
   }
 
@@ -7,7 +13,6 @@ export function formatActivityStatus(isOnline: boolean, lastSeen: number): strin
     return 'offline'
   }
 
-  const now = Date.now()
   const diff = now - lastSeen
   const seconds = Math.floor(diff / 1000)
   const minutes = Math.floor(seconds / 60)

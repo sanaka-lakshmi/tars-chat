@@ -18,9 +18,15 @@ export const syncUser = mutation({
         isOnline: true,
         lastSeen: Date.now(),
       })
+      // Ensure other users are marked offline when this user syncs
+      const allUsers = await ctx.db.query('users').collect()
+      const others = allUsers.filter(u => u.clerkId !== args.clerkId)
+      for (const o of others) {
+        await ctx.db.patch(o._id, { isOnline: false })
+      }
       return existing._id
     } else {
-      return await ctx.db.insert('users', {
+      const id = await ctx.db.insert('users', {
         clerkId: args.clerkId,
         name: args.name,
         imageUrl: args.imageUrl,
@@ -28,6 +34,13 @@ export const syncUser = mutation({
         isOnline: true,
         lastSeen: Date.now(),
       })
+      // After inserting a new user, ensure other users are marked offline
+      const allUsers = await ctx.db.query('users').collect()
+      const others = allUsers.filter(u => u.clerkId !== args.clerkId)
+      for (const o of others) {
+        await ctx.db.patch(o._id, { isOnline: false })
+      }
+      return id
     }
   },
 })

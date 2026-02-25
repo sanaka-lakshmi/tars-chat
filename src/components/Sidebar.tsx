@@ -11,9 +11,10 @@ import { useTheme } from './ChatApp'
 interface SidebarProps {
   currentUserId: string
   onSelectConversation: (id: string) => void
+  onClose?: () => void
 }
 
-export function Sidebar({ currentUserId, onSelectConversation }: SidebarProps) {
+export function Sidebar({ currentUserId, onSelectConversation, onClose }: SidebarProps) {
   const { isDark } = useTheme()
   const users = useQuery(api.users.getUsers)
   const conversations = useQuery(api.conversations.getConversations, { userId: currentUserId as any })
@@ -71,6 +72,11 @@ export function Sidebar({ currentUserId, onSelectConversation }: SidebarProps) {
 
   return (
     <div className={`w-80 border-r flex flex-col ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+      {onClose && (
+        <div className="p-2 border-b flex items-center justify-between">
+          <button onClick={onClose} className="text-sm px-2 py-1 rounded bg-gray-200 dark:bg-gray-700">Close</button>
+        </div>
+      )}
       <div className={`p-4 border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
         <div className="flex space-x-1 mb-4">
           <button
