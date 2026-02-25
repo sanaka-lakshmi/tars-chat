@@ -17,31 +17,9 @@ export function ChatApp() {
   const markAsRead = useMutation(api.conversations.markAsRead)
   const [currentUserId, setCurrentUserId] = useState<string | null>(null)
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null)
-  const [isDark, setIsDark] = useState(false)
   const inactivityTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const [showSidebar, setShowSidebar] = useState(false)
-
-  // Initialize dark mode from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem('theme')
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    const shouldBeDark = saved ? saved === 'dark' : prefersDark
-    setIsDark(shouldBeDark)
-    if (shouldBeDark) {
-      document.documentElement.classList.add('dark')
-    }
-  }, [])
-
-  const toggleDarkMode = () => {
-    setIsDark(!isDark)
-    if (!isDark) {
-      document.documentElement.classList.add('dark')
-      localStorage.setItem('theme', 'dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-      localStorage.setItem('theme', 'light')
-    }
-  }
+  const { isDark } = useTheme()
 
   const handleSelectConversation = (id: string) => {
     setSelectedConversation(id)
@@ -121,8 +99,8 @@ export function ChatApp() {
   if (!currentUserId) return <div>Loading...</div>
 
   return (
-      <div className={`flex h-screen ${isDark ? 'dark' : ''}`}>
-        <div className="pt-12 flex h-screen w-full bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+      <div className={`flex h-screen ${isDark ? 'dark bg-gray-900' : 'bg-gray-50'}`}>
+        <div className={`flex h-screen w-full ${isDark ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'}`}>
           {/* Mobile sidebar overlay */}
           <div className={`sm:hidden ${showSidebar ? 'block' : 'hidden'}`}>
             <div className="fixed inset-0 z-40 bg-black/40" onClick={() => setShowSidebar(false)} />

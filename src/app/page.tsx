@@ -9,7 +9,7 @@ import { Sun, Moon } from 'lucide-react'
 export default function Home() {
   const { isDark, toggleDarkMode } = useTheme()
   return (
-    <div className={`min-h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-100'}`}> 
+    <div className={`min-h-screen ${isDark ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'}`}> 
       <SignedOut>
         <div className="flex items-center justify-center min-h-screen">
           <div className="bg-white p-8 rounded-lg shadow-md text-center max-w-md">

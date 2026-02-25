@@ -147,7 +147,7 @@ export function Sidebar({ currentUserId, onSelectConversation, onClose }: Sideba
           </div>
         )}
       </div>
-      <div className={`flex-1 overflow-y-auto ${isDark ? 'bg-gray-900' : ''}`}>
+      <div className={`flex-1 overflow-y-auto ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
         {activeTab === 'users' ? (
           <>
             {filteredUsers?.length ? (
@@ -174,7 +174,7 @@ export function Sidebar({ currentUserId, onSelectConversation, onClose }: Sideba
                       className="rounded-full"
                     />
                     {u.isOnline && (
-                      <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
+                      <div className={`absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 ${isDark ? 'border-gray-900' : 'border-white'} rounded-full`} />
                     )}
                   </div>
                   <div className="ml-3">

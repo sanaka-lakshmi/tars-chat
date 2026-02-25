@@ -233,7 +233,7 @@ export function ChatArea({ conversationId, currentUserId }: ChatAreaProps) {
   }
 
   return (
-    <div className={`flex-1 flex flex-col ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
+    <div className={`flex-1 flex flex-col border-l ${isDark ? 'bg-gray-900 border-gray-800' : 'bg-gray-50 border-gray-200'}`}>
       {/* Chat Header */}
       <div className={`p-4 border-b ${isDark ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'}`}>
         <div className="flex items-center justify-between">
